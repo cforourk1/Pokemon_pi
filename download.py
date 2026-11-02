@@ -21,7 +21,18 @@ for i in range(1, 152):
     power = 0
     for s in data["stats"]:
         power = power + s["base_stat"]
-    pokedex[i] = {"name": data["name"], "hp": hp, "power": power}
+
+    # evolution
+    species = requests.get(data["species"]["url"]).json()
+    chain = requests.get(species["evolution_chain"]["url"]).json()["chain"]
+    min_level = 1
+    for stage2 in chain["evolves_to"]:
+        if stage2["species"]["name"] == data["name"]:
+            min_level = stage2["evolution_details"][0]["min_level"] or 20
+        for stage3 in stage2["evolves_to"]:
+            if stage3["species"]["name"] == data["name"]:
+                min_level = stage3["evolution_details"][0]["min_level"] or 30
+    pokedex[i] = {"name": data["name"], "hp": hp, "power": power, "min_level": min_level}
     # get sprites
     sprite_url = data["sprites"]["front_default"]
     image = requests.get(sprite_url)
