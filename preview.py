@@ -34,14 +34,16 @@ for number in range(1, 152):
     surfaces.append(surface)
 
 # show them one at a time
-index = = random.randinit(0, 150)
-level = random.randint(1, 100)
-hp_now = (2 * hp * level) // 100 + level + 10
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    index = random.randint(0, 150)
+    hp = pokedex[str(index + 1)]["hp"]
+    level = random.randint(1, 100)
+    hp_now = (2 * hp * level) // 100 + level + 10
+    print(pokedex[str(index + 1)]["name"], level, hp_now)
     window.blit(surfaces[index], (0, 0))
     pygame.display.flip()
     pygame.time.wait(1000)
