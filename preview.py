@@ -42,7 +42,8 @@ while running:
     index = random.randint(0, 150)
     name = pokedex[str(index + 1)]["name"]
     hp = pokedex[str(index + 1)]["hp"]
-    level = random.randint(1, 100)
+    min_level = pokedex[str(index + 1)]["min_level"]
+    level = random.randint(min_level, 99)
     hp_now = (2 * hp * level) // 100 + level + 10
     text = font.render(f"{name} Lv {level} HP {hp_now}", True, "white")
     print(pokedex[str(index + 1)]["name"], level, hp_now)
