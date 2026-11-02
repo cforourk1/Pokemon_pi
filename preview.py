@@ -1,8 +1,19 @@
+import json
+import random
 import pygame
 from PIL import Image
 
+
+
 pygame.init()
 window = pygame.display.set_mode((960, 720))
+
+with open("pokedex.json") as f:
+    pokedex = json.load(f)
+
+# loop to capitalize names
+for entry in pokedex.values():
+    entry["name"] = entry["name"].capitalize()
 
 # load all 151 sprites into a list of surfaces
 surfaces = []
@@ -23,7 +34,9 @@ for number in range(1, 152):
     surfaces.append(surface)
 
 # show them one at a time
-index = 0
+index = = random.randinit(0, 150)
+level = random.randint(1, 100)
+hp_now = (2 * hp * level) // 100 + level + 10
 running = True
 while running:
     for event in pygame.event.get():
@@ -32,7 +45,4 @@ while running:
     window.blit(surfaces[index], (0, 0))
     pygame.display.flip()
     pygame.time.wait(1000)
-    index = index + 1
-    if index == 151:
-        index = 0
 pygame.quit()
