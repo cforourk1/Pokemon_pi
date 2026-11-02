@@ -7,7 +7,7 @@ from PIL import Image
 
 pygame.init()
 window = pygame.display.set_mode((960, 720))
-
+font = pygame.font.Font(None, 48)
 with open("pokedex.json") as f:
     pokedex = json.load(f)
 
@@ -40,11 +40,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     index = random.randint(0, 150)
+    name = pokedex[str(index + 1)]["name"]
     hp = pokedex[str(index + 1)]["hp"]
     level = random.randint(1, 100)
     hp_now = (2 * hp * level) // 100 + level + 10
+    text = font.render(f"{name} Lv {level} HP {hp_now}", True, "white")
     print(pokedex[str(index + 1)]["name"], level, hp_now)
     window.blit(surfaces[index], (0, 0))
+    window.blit(text, (40, 640))
     pygame.display.flip()
     pygame.time.wait(1000)
 pygame.quit()
