@@ -25,7 +25,7 @@ for number in range(1, 152):
 
     # center sprite
     x = (canvas.width - sprite.width) // 2
-    y = (canvas.height - sprite.height) // 2
+    y = 0
     canvas.paste(sprite, (x, y), sprite)
 
     # convert pillow canvas to a pygame surface, scale 3x
@@ -51,7 +51,8 @@ while running:
             window.blit(surfaces[index], (0, 0))
             for i, line in enumerate(lines):
                 line_image = font.render(line, True, "white")
-                window.blit(line_image, (40, 560 +i * 50)
+                line_rect = line_image.get_rect(centerx=480,top=580 +i * 50)
+                window.blit(line_image, line_rect)
             pygame.display.flip()
     pygame.time.wait(30)
 pygame.quit()
