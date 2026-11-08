@@ -7,7 +7,7 @@ from PIL import Image
 
 pygame.init()
 window = pygame.display.set_mode((960, 720))
-font = pygame.font.Font(None, 48)
+font = pygame.font.Font("fonts/pixel.ttf", 32)
 with open("pokedex.json") as f:
     pokedex = json.load(f)
 
@@ -33,22 +33,25 @@ for number in range(1, 152):
     surface = pygame.transform.scale(surface, (960, 720))
     surfaces.append(surface)
 
-# show them one at a time
+# Click and display a random pokemon
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    index = random.randint(0, 150)
-    name = pokedex[str(index + 1)]["name"]
-    hp = pokedex[str(index + 1)]["hp"]
-    min_level = pokedex[str(index + 1)]["min_level"]
-    level = random.randint(min_level, 99)
-    hp_now = (2 * hp * level) // 100 + level + 10
-    text = font.render(f"{name} Lv {level} HP {hp_now}", True, "white")
-    print(pokedex[str(index + 1)]["name"], level, hp_now)
-    window.blit(surfaces[index], (0, 0))
-    window.blit(text, (40, 640))
-    pygame.display.flip()
-    pygame.time.wait(1000)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            index = random.randint(0, 150)
+            name = pokedex[str(index + 1)]["name"]
+            hp = pokedex[str(index + 1)]["hp"]
+            min_level = pokedex[str(index + 1)]["min_level"]
+            level = random.randint(min_level, 99)
+            hp_now = (2 * hp * level) // 100 + level + 10
+            lines = [f"{name}", f"Lv: {level}", f"HP: {hp_now}"]
+            print(pokedex[str(index + 1)]["name"], level, hp_now)
+            window.blit(surfaces[index], (0, 0))
+            for i, line in enumerate(lines):
+                line_image = font.render(line, True, "white")
+                window.blit(line_image, (40, 560 +i * 50)
+            pygame.display.flip()
+    pygame.time.wait(30)
 pygame.quit()
