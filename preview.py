@@ -26,6 +26,14 @@ with open("pokedex.json") as f:
 for entry in pokedex.values():
     entry["name"] = entry["name"].capitalize()
 
+# get list of types
+pktype = []
+for entry in pokedex.values():
+    for type_name in entry["types"]:
+        if type_name not in pktype:
+            pktype.append(type_name)
+print(pktype)
+
 # load all 151 sprites into a list of surfaces
 surfaces = []
 for number in range(1, 152):
