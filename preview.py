@@ -50,6 +50,64 @@ for number in range(1, 152):
     surface = pygame.image.frombytes(canvas.tobytes(), canvas.size, "RGB")
     surfaces.append(surface)
 
+# wait for some milliseconds, but keep the window responding
+def pause(ms):
+    end = pygame.time.get_ticks() + ms
+    while pygame.time.get_ticks() < end:
+        pygame.event.pump()
+        pygame.time.wait(30)
+
+
+# draw a smaller pokemon card on one half of the screen
+# centerx is the middle of that half: 240 for the left, 720 for the right
+def draw_small_card(fighter, player, centerx):
+    # which player this card belongs to
+    player_image = stat_font.render(f"Player {player}", True, "white")
+    window.blit(player_image, player_image.get_rect(centerx=centerx, top=20))
+
+    # sprite, scaled 3x so two fit side by side
+    sprite = pygame.image.load(f"sprites/{fighter['key']}.png")
+    sprite = pygame.transform.scale(sprite, (sprite.get_width() * 3, sprite.get_height() * 3))
+    window.blit(sprite, sprite.get_rect(centerx=centerx, top=50))
+
+    # name
+    name_image = name_font.render(fighter["name"], True, "white")
+    window.blit(name_image, name_image.get_rect(centerx=centerx, top=350))
+
+    # type
+    type_text = " / ".join(fighter["types"]).title()
+    type_image = stat_font.render(type_text, True, "white")
+    window.blit(type_image, type_image.get_rect(centerx=centerx, top=395))
+
+    # level, hp, power
+    stats = f"Lv {fighter['level']}   HP {fighter['hp']}   PWR {fighter['power']}"
+    stats_image = stat_font.render(stats, True, "white")
+    window.blit(stats_image, stats_image.get_rect(centerx=centerx, top=428))
+
+    # moveset heading
+    heading_image = stat_font.render("Moveset", True, "white")
+    window.blit(heading_image, heading_image.get_rect(centerx=centerx, top=480))
+
+    # turn each move into a picture of its text
+    move_images = []
+    for move in fighter["moves"]:
+        move_name = move.replace("-", " ").title()
+        move_images.append(move_font.render(move_name, True, "white"))
+
+    # find the widest move so the list can be centered on this half
+    widest = 0
+    for image in move_images:
+        if image.get_width() > widest:
+            widest = image.get_width()
+    list_left = centerx - (widest + 20) // 2
+
+    # draw each move with a small square bullet in front
+    for n, image in enumerate(move_images):
+        top = 515 + n * 30
+        pygame.draw.rect(window, "white", (list_left, top + 8, 6, 6))
+        window.blit(image, (list_left + 20, top))
+
+
 # turn keeps track of where we are:
 # 0 = start screen, 1 = player 1 rolls, 2 = player 2 rolls, 3 = battle
 turn = 0
@@ -100,7 +158,7 @@ while running:
                 class_image = name_font.render(rolled_type.title(), True, "white")
                 window.blit(class_image, class_image.get_rect(centerx=480, centery=360))
                 pygame.display.flip()
-                pygame.time.wait(1500)
+                pause(2500)
 
                 # pick a random pokemon of that type
                 fighter_key = random.choice(matches)
@@ -179,21 +237,37 @@ while running:
                     window.blit(image, (list_left + 20, top))
 
                 # save this player's pokemon for the battle
-                fighter = {"key": fighter_key, "name": name, "level": level,
-                           "hp": hp_now, "moves": last_four}
+                fighter = {"key": fighter_key, "name": name, "types": types,
+                           "level": level, "hp": hp_now, "power": power,
+                           "moves": last_four}
 
                 if turn == 1:
-                    # player 1 is done: ask player 2 to roll
+                    # player 1 is done: show their pokemon for 5 seconds
                     fighter1 = fighter
+                    pygame.display.flip()
+                    pause(5000)
+
+                    # back to the title screen, ask player 2 to roll
+                    window.fill("black")
+                    window.blit(title_image, title_rect)
                     prompt_image = stat_font.render("Player 2 - tap to roll", True, "white")
-                    window.blit(prompt_image, prompt_image.get_rect(centerx=480, centery=690))
+                    window.blit(prompt_image, prompt_image.get_rect(centerx=480, centery=400))
                     pygame.display.flip()
                     turn = 2
                 else:
-                    # player 2 is done: show their pokemon, then go to battle
+                    # player 2 is done: show their pokemon for 5 seconds
                     fighter2 = fighter
                     pygame.display.flip()
-                    pygame.time.wait(2000)
+                    pause(5000)
+
+                    # both cards side by side for 5 seconds
+                    window.fill("black")
+                    draw_small_card(fighter1, 1, 240)
+                    draw_small_card(fighter2, 2, 720)
+                    vs_image = name_font.render("VS", True, "white")
+                    window.blit(vs_image, vs_image.get_rect(centerx=480, centery=200))
+                    pygame.display.flip()
+                    pause(5000)
 
                     # battle placeholder - the real battle goes here later
                     window.fill("black")
