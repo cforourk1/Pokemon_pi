@@ -1,6 +1,7 @@
 import json
 import random
 import pygame
+from type_chart import effectiveness
 from PIL import Image
 
 

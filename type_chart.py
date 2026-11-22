@@ -51,3 +51,10 @@ type_chart = {
     "fairy":    {"fire": 0.5, "fighting": 2, "poison": 0.5, "dragon": 2,
                  "dark": 2, "steel": 0.5},
 }
+
+#function to take in the move types, loop through them, look at type chart and return correct multiplier
+def effectiveness(move_type, defender_types):
+    multiplier = 1
+    for t in defender_types:
+        multiplier = multiplier * type_chart[move_type].get(t, 1)
+    return multiplier
