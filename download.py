@@ -18,6 +18,11 @@ for i in range(1, 152):
 
     # get pokemon data
     hp = data["stats"][0]["base_stat"]
+    attack = data["stats"][1]["base_stat"]
+    defense = data["stats"][2]["base_stat"]
+    sp_attack = data["stats"][3]["base_stat"]
+    sp_defense = data["stats"][4]["base_stat"]
+    speed = data["stats"][5]["base_stat"]
     power = 0
     for s in data["stats"]:
         power = power + s["base_stat"]
@@ -44,7 +49,7 @@ for i in range(1, 152):
         for stage3 in stage2["evolves_to"]:
             if stage3["species"]["name"] == data["name"]:
                 min_level = stage3["evolution_details"][0]["min_level"] or 30
-    pokedex[i] = {"name": data["name"], "types": types,  "hp": hp, "power": power, "min_level": min_level, "moves": moves}
+    pokedex[i] = {"name": data["name"], "types": types,  "hp": hp, "attack": attack, "defense": defense, "sp_attack": sp_attack, "sp_defense": sp_defense, "speed": speed,  "power": power, "min_level": min_level, "moves": moves}
     # get sprites
    # sprite_url = data["sprites"]["front_default"]
   #  image = requests.get(sprite_url)
