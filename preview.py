@@ -22,6 +22,8 @@ window.blit(status_image, status_image.get_rect(centerx=480, centery=400))
 pygame.display.flip()
 with open("pokedex.json") as f:
     pokedex = json.load(f)
+with open("moves.json") as f:
+    move_data = json.load(f)
 
 # loop to capitalize names
 for entry in pokedex.values():
@@ -114,8 +116,8 @@ def draw_small_card(fighter, player, centerx):
 turn = 0
 
 # each player's pokemon gets saved here after they roll
-fighter1 = None
-fighter2 = None
+player1 = None
+player2 = None
 
 # loading done, show the start screen
 window.fill("black")
@@ -185,8 +187,17 @@ while running:
                     if m["name"] not in names:
                         names.append(m["name"])
                 last_four = names[-4:]
+                attack_moves = []
+                for move in last_four:
+                    if move_data[move]["damage_class"] != "status" and move != "counter":
+                        attack_moves.append(move)
 
                 hp_now = (2 * hp * level) // 100 + level + 10
+                attack = (2 * pokedex[fighter_key]["attack"] * level) // 100 + 5
+                sp_attack = (2 * pokedex[fighter_key]["sp_attack"] * level) // 100 + 5
+                defense = (2 * pokedex[fighter_key]["defense"] * level) // 100 + 5
+                sp_defense = (2 * pokedex[fighter_key]["sp_defense"] * level) // 100 + 5
+                speed = (2 * pokedex[fighter_key]["speed"] * level) // 100 + 5
                 print(f"Player {turn} rolled {rolled_type}: {name}", level, hp_now, last_four)
 
                 # sprite
@@ -239,15 +250,17 @@ while running:
 
                 # save this player's pokemon for the battle
                 fighter = {"key": fighter_key, "name": name, "types": types,
-                           "level": level, "hp": hp_now, "power": power,
+                           "level": level, "hp": hp_now, "max_hp": hp_now,
+                           "power": power, "speed": speed,
+                           "attack": attack, "sp_attack": sp_attack,
+                           "defense": defense, "sp_defense": sp_defense,
                            "moves": last_four}
 
                 if turn == 1:
                     # player 1 is done: show their pokemon for 5 seconds
-                    fighter1 = fighter
+                    player1 = fighter
                     pygame.display.flip()
                     pause(5000)
-
                     # back to the title screen, ask player 2 to roll
                     window.fill("black")
                     window.blit(title_image, title_rect)
@@ -257,14 +270,14 @@ while running:
                     turn = 2
                 else:
                     # player 2 is done: show their pokemon for 5 seconds
-                    fighter2 = fighter
+                    player2 = fighter
                     pygame.display.flip()
                     pause(5000)
 
                     # both cards side by side for 5 seconds
                     window.fill("black")
-                    draw_small_card(fighter1, 1, 240)
-                    draw_small_card(fighter2, 2, 720)
+                    draw_small_card(player1, 1, 240)
+                    draw_small_card(player2, 2, 720)
                     vs_image = name_font.render("VS", True, "white")
                     window.blit(vs_image, vs_image.get_rect(centerx=480, centery=200))
                     pygame.display.flip()
@@ -274,7 +287,7 @@ while running:
                     window.fill("black")
                     battle_image = name_font.render("Battle!", True, "white")
                     window.blit(battle_image, battle_image.get_rect(centerx=480, centery=320))
-                    versus = f"{fighter1['name']}  vs  {fighter2['name']}"
+                    versus = f"{player1['name']}  vs  {player2['name']}"
                     versus_image = stat_font.render(versus, True, "white")
                     window.blit(versus_image, versus_image.get_rect(centerx=480, centery=400))
                     pygame.display.flip()
