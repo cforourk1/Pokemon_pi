@@ -24,6 +24,8 @@ with open("pokedex.json") as f:
     pokedex = json.load(f)
 with open("moves.json") as f:
     move_data = json.load(f)
+move_data["struggle"] = {"power": 50, "accuracy": None, "type": "normal", "damage_class": "physical", "priority": 0, "min_hits": None, "max_hits": None, "drain": 0, "crit_rate": 0}   
+
 
 # loop to capitalize names
 for entry in pokedex.values():
@@ -184,13 +186,12 @@ while running:
                 # remove duplicates, keep the last four
                 names = []
                 for m in known:
-                    if m["name"] not in names:
-                        names.append(m["name"])
+                    if m["level"] <= level and move_data[m["name"]]["damage_class"] != "status" and m["name"] != "counter":
+                      if m["name"] not in names:
+                          names.append(m["name"])
                 last_four = names[-4:]
-                attack_moves = []
-                for move in last_four:
-                    if move_data[move]["damage_class"] != "status" and move != "counter":
-                        attack_moves.append(move)
+                if len(last_four) == 0:
+                    last_four = ["struggle"]
 
                 hp_now = (2 * hp * level) // 100 + level + 10
                 attack = (2 * pokedex[fighter_key]["attack"] * level) // 100 + 5
