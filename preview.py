@@ -112,20 +112,35 @@ def draw_small_card(fighter, player, centerx):
         pygame.draw.rect(window, "white", (list_left, top + 8, 6, 6))
         window.blit(image, (list_left + 20, top))
 
-#show what move was used and determine if the move is special
+# one attack: attacker uses a random move on defender
 def use_move(attacker, defender):
+    # pick one of the attacker's moves and look up its data in moves.json
     move_name = random.choice(attacker["moves"])
     move = move_data[move_name]
+    print(f"{attacker['name']} used {move_name}!")
+
+    # accuracy check: roll 1-100, the move misses if the roll is higher than its accuracy
+    # accuracy None means the move never misses (Swift, Struggle)
+    if move["accuracy"] is not None:
+        roll = random.randint(1, 100)
+        if roll > move["accuracy"]:
+            print("But it missed!")
+            return    # stop here, a miss does no damage
+
+    # physical moves use attack vs defense, special moves use sp_attack vs sp_defense
     if move["damage_class"] == "physical":
         a = attacker["attack"]
         d = defender["defense"]
-    else: 
+    else:
         a = attacker["sp_attack"]
         d = defender["sp_defense"]
+
+    # damage formula (STAB, type effectiveness, crits and random come later)
     damage = ((2 * attacker["level"] / 5 + 2) * move["power"] * a / d) / 50 + 2
-    damage = int(damage)
+    damage = int(damage)    # round down, like the games
+
+    # take the damage off the defender's hp
     defender["hp"] = defender["hp"] - damage
-    print(f"{attacker['name']} used {move_name}!")
     print(f"{defender['name']} took {damage} damage. {defender['hp']} HP left.")
 
 
@@ -203,8 +218,8 @@ while running:
                 names = []
                 for m in known:
                     if m["level"] <= level and move_data[m["name"]]["damage_class"] != "status" and m["name"] != "counter":
-                      if m["name"] not in names:
-                          names.append(m["name"])
+                        if m["name"] not in names:
+                            names.append(m["name"])
                 last_four = names[-4:]
                 if len(last_four) == 0:
                     last_four = ["struggle"]
@@ -308,6 +323,8 @@ while running:
                     versus_image = stat_font.render(versus, True, "white")
                     window.blit(versus_image, versus_image.get_rect(centerx=480, centery=400))
                     pygame.display.flip()
+                    # first test attack: player 1 hits player 2 once (prints in the terminal)
+                    use_move(player1, player2)
                     turn = 3
 
                 # ignore any taps made while the screen was waiting
