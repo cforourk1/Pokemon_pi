@@ -112,6 +112,22 @@ def draw_small_card(fighter, player, centerx):
         pygame.draw.rect(window, "white", (list_left, top + 8, 6, 6))
         window.blit(image, (list_left + 20, top))
 
+#show what move was used and determine if the move is special
+def use_move(attacker, defender):
+    move_name = random.choice(attacker["moves"])
+    move = move_data[move_name]
+    if move["damage_class"] == "physical":
+        a = attacker["attack"]
+        d = defender["defense"]
+    else: 
+        a = attacker["sp_attack"]
+        d = defender["sp_defense"]
+    damage = ((2 * attacker["level"] / 5 + 2) * move["power"] * a / d) / 50 + 2
+    damage = int(damage)
+    defender["hp"] = defender["hp"] - damage
+    print(f"{attacker['name']} used {move_name}!")
+    print(f"{defender['name']} took {damage} damage. {defender['hp']} HP left.")
+
 
 # turn keeps track of where we are:
 # 0 = start screen, 1 = player 1 rolls, 2 = player 2 rolls, 3 = battle
